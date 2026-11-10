@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: 'Manrope'; font-weight: 500; src: url('assets/fonts/manrope-latin-500-normal.woff2') format('woff2'); }
+      @font-face { font-family: 'Manrope'; font-weight: 700; src: url('assets/fonts/manrope-latin-700-normal.woff2') format('woff2'); }
+      @font-face { font-family: 'Manrope'; font-weight: 800; src: url('assets/fonts/manrope-latin-800-normal.woff2') format('woff2'); }
+      @font-face { font-family: 'JetBrains Mono'; font-weight: 500; src: url('assets/fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2'); }
+      :root {
+        --bg: #f3f7fb; --ink: #0b1d30; --soft: #263a51; --muted: #4d6077;
+        --blue: #0077c8; --deep: #005a97; --bright: #009ef7;
+        --line: rgba(0, 90, 151, 0.2); --green: #157a46; --red: #b8322a; --amber: #a85f0c;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+      #root { position: relative; width: 100%; height: 100%; font-family: 'Manrope', sans-serif; color: var(--ink); overflow: hidden; }
+      #bg {
+        position: absolute; inset: 0;
+        background:
+          radial-gradient(ellipse 50% 50% at 50% 45%, rgba(0, 158, 247, 0.08), transparent 70%),
+          repeating-linear-gradient(0deg, rgba(0, 90, 151, 0.045) 0 1px, transparent 1px 64px),
+          repeating-linear-gradient(90deg, rgba(0, 90, 151, 0.045) 0 1px, transparent 1px 64px),
+          var(--bg);
+      }
+      .eyebrow { position: absolute; left: 120px; top: 70px; font-family: 'JetBrains Mono', monospace; font-size: 22px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--blue); }
+      .title { position: absolute; left: 120px; top: 106px; font-weight: 800; font-size: 70px; letter-spacing: -0.03em; }
+      .title span { display: inline-block; }
+      .title em { font-style: normal; background: linear-gradient(90deg, var(--deep), var(--bright)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+      svg#wires { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+      #wires path { fill: none; stroke: rgba(0, 119, 200, 0.45); stroke-width: 4; stroke-linecap: round; }
+      #wires #w-old { stroke: rgba(77, 96, 119, 0.4); stroke-dasharray: 12 12; }
+
+      .node {
+        position: absolute; width: 270px; height: 190px; border-radius: 28px;
+        background: linear-gradient(160deg, #ffffff, #eef4fa); border: 1.5px solid var(--line);
+        box-shadow: 0 24px 60px rgba(8, 40, 75, 0.12);
+        display: flex; flex-direction: column; justify-content: center; padding: 0 30px;
+      }
+      .node span { font-size: 24px; color: var(--muted); font-weight: 700; }
+      .node b { font-size: 38px; font-weight: 800; letter-spacing: -0.02em; }
+      .node .glow { position: absolute; inset: -3px; border-radius: 28px; border: 3px solid var(--bright); box-shadow: 0 0 44px rgba(0, 158, 247, 0.6); opacity: 0; }
+      #laya { width: 340px; height: 230px; background: linear-gradient(150deg, #0b2c4d, #003a66); border-color: transparent; color: #fff; box-shadow: 0 30px 80px rgba(0, 90, 151, 0.45), 0 0 0 8px rgba(0, 158, 247, 0.18); }
+      #laya span { color: #9fd8ff; }
+      #laya .badge { position: absolute; top: -18px; left: 30px; padding: 6px 16px; border-radius: 999px; background: var(--bright); color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 17px; letter-spacing: 0.16em; }
+      #laya .hex { position: absolute; right: 26px; top: 26px; width: 58px; height: 64px; }
+
+      .po {
+        position: absolute; width: 250px; padding: 16px 20px; border-radius: 16px; background: #fff;
+        border: 2px solid var(--blue); box-shadow: 0 16px 40px rgba(0, 119, 200, 0.25); opacity: 0;
+      }
+      .po small { display: block; font-size: 18px; font-weight: 700; color: var(--muted); }
+      .po b { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 500; }
+
+      .qpanel {
+        position: absolute; left: 640px; top: 600px; width: 640px; padding: 28px 34px; border-radius: 26px;
+        background: #fff; border: 1.5px solid var(--line); box-shadow: 0 24px 60px rgba(8, 40, 75, 0.14); opacity: 0;
+      }
+      .qpanel h4 { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 500; letter-spacing: 0.14em; color: var(--blue); text-transform: uppercase; margin-bottom: 18px; }
+      .qrow { display: grid; grid-template-columns: 170px 1fr 120px; align-items: center; gap: 16px; padding: 12px 0; border-top: 1px solid var(--line); font-size: 26px; font-weight: 700; }
+      .qrow:first-of-type { border-top: 0; }
+      .qrow em { font-style: normal; color: var(--soft); }
+      .qrow b { font-family: 'JetBrains Mono', monospace; font-weight: 500; text-align: right; }
+      .chip { justify-self: start; padding: 6px 18px; border-radius: 999px; color: #fff; font-size: 22px; font-weight: 800; }
+      .chip.g { background: var(--green); }
+      .chip.r { background: var(--red); }
+      .chip.n { background: #5f7186; }
+
+      #queue {
+        position: absolute; left: 1420px; top: 590px; width: 440px; height: 345px; padding: 26px 20px; border-radius: 26px;
+        background: rgba(255, 255, 255, 0.75); border: 1.5px dashed var(--line); opacity: 0;
+      }
+      #queue h4 { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 500; letter-spacing: 0.14em; color: var(--blue); text-transform: uppercase; padding-left: 10px; }
+      .item {
+        position: absolute; left: 1440px; width: 400px; height: 84px; padding: 0 20px; border-radius: 16px; background: #fff;
+        border: 1.5px solid var(--line); border-left: 8px solid var(--green); box-shadow: 0 10px 30px rgba(8, 40, 75, 0.1);
+        display: flex; align-items: center; justify-content: space-between; opacity: 0;
+      }
+      .item b { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 500; }
+      .item span { font-size: 20px; font-weight: 800; padding: 6px 12px; border-radius: 10px; }
+      .item.g span { color: var(--green); background: rgba(21, 122, 70, 0.1); }
+      .item.r { border-left-color: var(--red); }
+      .item.r span { color: var(--red); background: rgba(184, 50, 42, 0.1); }
+      .item.n { border-left-color: #5f7186; }
+      .item.n span { color: #3c4d61; background: rgba(77, 96, 119, 0.12); }
+
+      #caption { position: absolute; left: 0; right: 0; bottom: 56px; text-align: center; font-size: 42px; font-weight: 800; letter-spacing: -0.02em; color: var(--soft); opacity: 0; }
+      #caption em { font-style: normal; color: var(--blue); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="22" data-width="1920" data-height="1080">
+      <div id="bg"></div>
+      <div id="eyebrow" class="eyebrow">Cómo encajaría</div>
+      <h1 id="title" class="title"><span>Una</span> <span>capa</span> <span>nueva</span> <span><em>que</em></span> <span><em>decide.</em></span></h1>
+
+      <svg id="wires" viewBox="0 0 1920 1080">
+        <path id="w1" d="M365 430 H425" />
+        <path id="w-old" d="M695 430 H1505" />
+        <path id="w2" d="M695 430 H790" />
+        <path id="w3" d="M1130 430 H1505" />
+        <path id="w4" d="M1640 525 V590" />
+      </svg>
+
+      <div id="n-ocr" class="node" style="left: 230px; top: 430px"><span>El OCR</span><b>lee</b><i class="glow"></i></div>
+      <div id="n-reg" class="node" style="left: 560px; top: 430px"><span>Las reglas</span><b>validan</b><i class="glow"></i></div>
+      <div id="laya" class="node" style="left: 960px; top: 430px">
+        <em class="badge">NUEVO</em>
+        <svg class="hex" viewBox="0 0 100 110"><path d="M50 4 92 28v54L50 106 8 82V28L50 4Z" fill="rgba(0,158,247,0.25)" stroke="#6cc8ff" stroke-width="5" stroke-linejoin="round"/></svg>
+        <span>Laya</span><b>decide</b><i class="glow"></i>
+      </div>
+      <div id="n-per" class="node" style="left: 1640px; top: 430px"><span>La persona</span><b>confirma</b><i class="glow"></i></div>
+
+      <div id="poA" class="po"><small>Urban Outfitters</small><b>PO 4501882</b></div>
+      <div id="poB" class="po"><small>A&amp;F · Ripple</small><b>PO 7731204</b></div>
+      <div id="poC" class="po"><small>Kontoor</small><b>PO 88213-CXL</b></div>
+
+      <div id="qA" class="qpanel">
+        <h4>Preguntas · PO 4501882</h4>
+        <div class="qrow"><span>Tipo</span><em>PO nueva</em><b>96%</b></div>
+        <div class="qrow"><span>Riesgo</span><i class="chip g">bajo</i><b>0.94</b></div>
+        <div class="qrow"><span>Revisar</span><em>nada en especial</em><b>—</b></div>
+      </div>
+      <div id="qB" class="qpanel">
+        <h4>Preguntas · PO 7731204</h4>
+        <div class="qrow"><span>Tipo</span><em>PO nueva</em><b>88%</b></div>
+        <div class="qrow"><span>Riesgo</span><i class="chip r">alto</i><b>0.83</b></div>
+        <div class="qrow"><span>Revisar</span><em>tallas</em><b>81%</b></div>
+      </div>
+      <div id="qC" class="qpanel">
+        <h4>Preguntas · PO 88213-CXL</h4>
+        <div class="qrow"><span>Tipo</span><em>Cancelación</em><b>99%</b></div>
+        <div class="qrow"><span>Riesgo</span><i class="chip g">bajo</i><b>0.97</b></div>
+        <div class="qrow"><span>Revisar</span><em>confirmar cancelación</em><b>—</b></div>
+      </div>
+
+      <div id="queue"><h4>Cola de revisión</h4></div>
+      <div id="iA" class="item g"><b>4501882</b><span>Riesgo bajo · rápida</span></div>
+      <div id="iB" class="item r"><b>7731204</b><span>Riesgo alto · tallas</span></div>
+      <div id="iC" class="item n"><b>88213</b><span>Cancelación · marcar</span></div>
+
+      <div id="caption">La persona sigue confirmando — <em>pero empieza por lo importante.</em></div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      gsap.set('.node', { xPercent: -50, yPercent: -50 });
+      gsap.set('.po', { xPercent: -50, yPercent: -50, x: -200, y: 262 });
+
+      const SLOT = [652, 746, 840];
+
+      tl.fromTo('#eyebrow', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.2);
+      tl.fromTo('#title span', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.09, ease: 'power3.out' }, 0.35);
+
+      ['#w1', '#w2', '#w3', '#w4'].forEach((id) => {
+        const l = document.querySelector(id).getTotalLength();
+        tl.set(id, { strokeDasharray: l, strokeDashoffset: l }, 0);
+      });
+      tl.set('#laya', { opacity: 0 }, 0);
+
+      // Flujo actual: tres pasos
+      ['#n-ocr', '#n-reg', '#n-per'].forEach((id, i) =>
+        tl.fromTo(id, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'expo.out' }, 0.9 + i * 0.25),
+      );
+      tl.to('#w1', { strokeDashoffset: 0, duration: 0.4 }, 1.4);
+      tl.fromTo('#w-old', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.6);
+
+      // Entra Laya
+      tl.to('#w-old', { opacity: 0, duration: 0.4 }, 2.5);
+      tl.fromTo('#laya', { opacity: 0, y: -160, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: 'back.out(1.6)' }, 2.5);
+      tl.fromTo('#laya .glow', { opacity: 0 }, { opacity: 1, duration: 0.3, yoyo: true, repeat: 1 }, 3.3);
+      tl.to('#w2', { strokeDashoffset: 0, duration: 0.4 }, 3.3);
+      tl.to('#w3', { strokeDashoffset: 0, duration: 0.5 }, 3.5);
+      tl.to('#w4', { strokeDashoffset: 0, duration: 0.3 }, 3.8);
+      tl.fromTo('#queue', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 3.9);
+
+      // Una PO pasa por Laya y termina en la cola
+      function runPo(po, panel, at) {
+        tl.set(po, { opacity: 1 }, at);
+        tl.to(po, { x: 960, duration: 1.1, ease: 'power2.inOut' }, at);
+        tl.fromTo('#laya .glow', { opacity: 0 }, { opacity: 1, duration: 0.25, yoyo: true, repeat: 1 }, at + 1.1);
+        tl.fromTo(panel, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' }, at + 1.2);
+        tl.fromTo(`${panel} .qrow`, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, stagger: 0.18 }, at + 1.35);
+        tl.to(po, { x: 1640, y: 650, scale: 0.5, opacity: 0, duration: 0.7, ease: 'power2.in' }, at + 3.1);
+        tl.to(panel, { opacity: 0, duration: 0.35 }, at + 3.4);
+      }
+      const itemIn = (id, slot, at) =>
+        tl.fromTo(id, { opacity: 0, top: SLOT[slot], x: 30 }, { opacity: 1, x: 0, duration: 0.45, ease: 'back.out(1.8)' }, at);
+
+      runPo('#poA', '#qA', 4.3);
+      itemIn('#iA', 0, 7.7);
+
+      runPo('#poB', '#qB', 8.4);
+      tl.to('#iA', { top: SLOT[1], duration: 0.5, ease: 'power2.inOut' }, 11.6);
+      itemIn('#iB', 0, 11.8);
+
+      runPo('#poC', '#qC', 12.5);
+      itemIn('#iC', 2, 15.9);
+
+      // Cierre
+      tl.fromTo('#n-per .glow', { opacity: 0 }, { opacity: 1, duration: 0.4 }, 16.8);
+      tl.to('#iB', { boxShadow: '0 0 0 4px rgba(184,50,42,0.25), 0 16px 40px rgba(184,50,42,0.25)', duration: 0.4 }, 16.8);
+      tl.fromTo('#caption', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 17.2);
+
+      tl.to({}, { duration: 0.1 }, 21.9);
+      window.__timelines['main'] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

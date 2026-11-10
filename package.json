@@ -1,0 +1,20 @@
+{
+  "name": "presentacion-jev-laya",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "render:videos": "node scripts/render-videos.mjs"
+  },
+  "dependencies": {
+    "@fontsource/jetbrains-mono": "^5.1.1",
+    "@fontsource/manrope": "^5.1.1",
+    "gsap": "^3.12.5"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}

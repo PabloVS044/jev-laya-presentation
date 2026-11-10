@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: 'Manrope'; font-weight: 500; src: url('assets/fonts/manrope-latin-500-normal.woff2') format('woff2'); }
+      @font-face { font-family: 'Manrope'; font-weight: 700; src: url('assets/fonts/manrope-latin-700-normal.woff2') format('woff2'); }
+      @font-face { font-family: 'Manrope'; font-weight: 800; src: url('assets/fonts/manrope-latin-800-normal.woff2') format('woff2'); }
+      @font-face { font-family: 'JetBrains Mono'; font-weight: 500; src: url('assets/fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2'); }
+      :root {
+        --bg: #f3f7fb; --ink: #0b1d30; --soft: #263a51; --muted: #4d6077;
+        --blue: #0077c8; --deep: #005a97; --bright: #009ef7;
+        --line: rgba(0, 90, 151, 0.2); --green: #157a46; --red: #b8322a;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+      #root { position: relative; width: 100%; height: 100%; font-family: 'Manrope', sans-serif; color: var(--ink); overflow: hidden; }
+      #bg {
+        position: absolute; inset: 0;
+        background:
+          radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0, 158, 247, 0.1), transparent 70%),
+          repeating-linear-gradient(0deg, rgba(0, 90, 151, 0.045) 0 1px, transparent 1px 64px),
+          repeating-linear-gradient(90deg, rgba(0, 90, 151, 0.045) 0 1px, transparent 1px 64px),
+          var(--bg);
+      }
+      .po {
+        position: absolute; left: 0; top: 0; width: 230px; padding: 16px 20px 18px; border-radius: 14px; background: #fff;
+        border: 1.5px solid var(--line); box-shadow: 0 18px 44px rgba(8, 40, 75, 0.14);
+      }
+      .po small { display: block; font-size: 17px; font-weight: 700; color: var(--muted); }
+      .po b { display: block; font-family: 'JetBrains Mono', monospace; font-size: 23px; font-weight: 500; margin-top: 2px; }
+      .po i { display: block; height: 8px; border-radius: 4px; background: #e2ebf4; margin-top: 10px; }
+      .po i + i { width: 70%; }
+      .po .pct { position: absolute; right: -14px; top: -14px; padding: 5px 12px; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 18px; color: #fff; opacity: 0; }
+
+      .bub { position: absolute; padding: 14px 24px; border-radius: 22px 22px 22px 6px; background: var(--ink); color: #fff; font-size: 30px; font-weight: 800; white-space: nowrap; opacity: 0; }
+
+      #hook { position: absolute; left: 0; right: 0; top: 470px; text-align: center; font-size: 96px; font-weight: 800; letter-spacing: -0.035em; opacity: 0; }
+      #hook em { font-style: normal; background: linear-gradient(90deg, var(--deep), var(--bright)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      #hook-bg { position: absolute; left: 50%; top: 540px; width: 1300px; height: 240px; margin: -120px 0 0 -650px; border-radius: 120px; background: radial-gradient(ellipse at center, rgba(243,247,251,0.97) 45%, rgba(243,247,251,0) 72%); opacity: 0; }
+
+      #hex { position: absolute; left: 960px; top: 540px; width: 220px; height: 242px; margin: -121px 0 0 -110px; opacity: 0; filter: drop-shadow(0 0 40px rgba(0, 158, 247, 0.6)); }
+
+      .lane { position: absolute; top: 250px; width: 340px; text-align: center; opacity: 0; }
+      .lane h3 { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; }
+      .lane span { display: block; margin: 10px auto 0; width: 80px; height: 6px; border-radius: 3px; }
+      #lane-ok { left: 360px; } #lane-ok span { background: var(--green); }
+      #lane-rev { left: 790px; } #lane-rev span { background: var(--red); }
+      #lane-cxl { left: 1220px; } #lane-cxl span { background: #5f7186; }
+      #speed { position: absolute; left: 0; right: 0; top: 140px; text-align: center; font-size: 34px; font-weight: 700; color: var(--soft); opacity: 0; }
+      #speed b { font-family: 'JetBrains Mono', monospace; color: var(--blue); font-weight: 500; }
+
+      #brand { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      #brand svg { width: 170px; height: 187px; opacity: 0; filter: drop-shadow(0 20px 40px rgba(0, 119, 200, 0.3)); }
+      #brand h1 { margin-top: 40px; font-size: 136px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+      #brand h1 span { display: inline-block; opacity: 0; }
+      #brand h1 em { font-style: normal; background: linear-gradient(90deg, var(--deep), var(--bright)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      #brand p { margin-top: 34px; font-family: 'JetBrains Mono', monospace; font-size: 30px; letter-spacing: 0.22em; color: var(--blue); text-transform: uppercase; opacity: 0; }
+      #brand small { margin-top: 60px; font-size: 26px; letter-spacing: 0.08em; color: var(--deep); opacity: 0; }
+      #brand small b { font-weight: 800; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+      <div id="bg"></div>
+      <div id="cards"></div>
+
+      <div class="bub" style="left: 250px; top: 170px">¿nueva?</div>
+      <div class="bub" style="left: 1430px; top: 210px">¿cancelación?</div>
+      <div class="bub" style="left: 330px; top: 820px">¿se leyó bien?</div>
+      <div class="bub" style="left: 1380px; top: 830px">¿qué formato?</div>
+
+      <div id="hook-bg"></div>
+      <div id="hook">Cada PO trae <em>una decisión.</em></div>
+
+      <svg id="hex" viewBox="0 0 100 110">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22aefb" /><stop offset="1" stop-color="#005a97" /></linearGradient></defs>
+        <path d="M50 4 92 28v54L50 106 8 82V28L50 4Z" fill="url(#g)" stroke="#9fd8ff" stroke-width="3" stroke-linejoin="round" />
+        <text x="50" y="66" text-anchor="middle" font-family="Manrope" font-weight="800" font-size="22" fill="#fff">Laya</text>
+      </svg>
+
+      <div id="speed">Decide cada una en <b>~30 ms</b>, con su porcentaje.</div>
+      <div id="lane-ok" class="lane"><h3>Lista</h3><span></span></div>
+      <div id="lane-rev" class="lane"><h3>Revisar primero</h3><span></span></div>
+      <div id="lane-cxl" class="lane"><h3>Cancelación</h3><span></span></div>
+
+      <div id="brand">
+        <svg viewBox="0 0 100 110">
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22aefb" /><stop offset="1" stop-color="#0077c8" /></linearGradient></defs>
+          <path d="M50 4 92 28v54L50 106 8 82V28L50 4Z" fill="none" stroke="#005a97" stroke-width="9" stroke-linejoin="round" />
+          <path d="M50 24 74 38v34L50 86 26 72V38L50 24Z" fill="url(#lg)" />
+          <path d="M40.5 69 50 41l9.5 28M44 60h12" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <h1><span>Modelos</span> <span>que</span> <span><em>deciden.</em></span></h1>
+        <p>JEV · Laya · Módulo OCR</p>
+        <small><b>APPAREL</b> LINKS, S.A.</small>
+      </div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // 12 POs: posición de caos, carril de destino y porcentaje
+      const POS = [
+        ['Urban Outfitters', '4501882', 180, 300, -12, 'ok', '97%'],
+        ['A&F · Ripple', '7731204', 560, 190, 8, 'rev', '64%'],
+        ['Kontoor', '88213', 1080, 160, -6, 'cxl', '99%'],
+        ['J.Crew', '1120456', 1560, 360, 14, 'ok', '95%'],
+        ['LIG', '330091', 140, 620, 10, 'rev', '58%'],
+        ['Lucky Brand', '60218', 600, 780, -9, 'ok', '98%'],
+        ['Urban Outfitters', '4501907', 1100, 820, 7, 'cxl', '99%'],
+        ['A&F · Philcos', '7731388', 1600, 680, -11, 'rev', '71%'],
+        ['Kontoor', '88240', 820, 330, 18, 'ok', '93%'],
+        ['J.Crew', '1120511', 380, 450, -16, 'cxl', '99%'],
+        ['A&F · SME', '7731490', 1380, 520, 5, 'rev', '62%'],
+        ['LIG', '330112', 860, 640, -4, 'ok', '97%'],
+      ];
+      const LANE = { ok: 530, rev: 960, cxl: 1390 };
+      const COLOR = { ok: '#157a46', rev: '#b8322a', cxl: '#5f7186' };
+      const host = document.getElementById('cards');
+      const count = { ok: 0, rev: 0, cxl: 0 };
+      const cards = POS.map(([buyer, po, x, y, r, lane, pct]) => {
+        const el = document.createElement('div');
+        el.className = 'po';
+        el.innerHTML = `<small>${buyer}</small><b>PO ${po}</b><i></i><i></i><em class="pct" style="background:${COLOR[lane]}">${pct}</em>`;
+        host.appendChild(el);
+        gsap.set(el, { xPercent: -50, yPercent: -50, x, y, rotation: r, opacity: 0 });
+        const slot = count[lane]++;
+        return { el, x, y, r, lane, slot };
+      });
+
+      // 1 · Caos (0–3.6 s)
+      cards.forEach((c, i) => {
+        tl.to(c.el, { opacity: 1, duration: 0.4 }, 0.1 + i * 0.07);
+        tl.to(c.el, { x: c.x + (i % 2 ? 26 : -26), y: c.y + (i % 3 ? -18 : 18), rotation: c.r * 1.4, duration: 3.4, ease: 'sine.inOut' }, 0.1);
+      });
+      tl.to('.bub', { opacity: 1, duration: 0.35, stagger: 0.25, ease: 'back.out(2)' }, 0.7);
+      tl.to('#hook-bg', { opacity: 1, duration: 0.5 }, 1.0);
+      tl.fromTo('#hook', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, 1.1);
+
+      // 2 · Todo entra al hexágono (3.6–5.4 s)
+      tl.to(['#hook', '#hook-bg', '.bub'], { opacity: 0, duration: 0.4 }, 3.6);
+      tl.fromTo('#hex', { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.8)' }, 3.8);
+      cards.forEach((c, i) => tl.to(c.el, { x: 960, y: 540, rotation: 0, scale: 0.2, opacity: 0, duration: 0.55, ease: 'power3.in' }, 3.9 + i * 0.06));
+      tl.to('#hex', { scale: 1.15, duration: 0.2, yoyo: true, repeat: 3, ease: 'sine.inOut' }, 4.7);
+
+      // 3 · Salen ordenadas en carriles (5.6–10 s)
+      tl.to('#hex', { scale: 0.2, opacity: 0, duration: 0.5, ease: 'power2.in' }, 5.4);
+      tl.fromTo('#speed', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5 }, 5.7);
+      tl.fromTo('.lane', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 }, 5.8);
+      cards.forEach((c, i) => {
+        const at = 6.3 + i * 0.22;
+        tl.fromTo(
+          c.el,
+          { x: 960, y: 760, scale: 0.3, rotation: 0, opacity: 0 },
+          { x: LANE[c.lane], y: 410 + c.slot * 126, scale: 1, opacity: 1, duration: 0.55, ease: 'power3.out', immediateRender: false },
+          at,
+        );
+        tl.fromTo(c.el.querySelector('.pct'), { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.3, ease: 'back.out(2.5)', immediateRender: false }, at + 0.45);
+      });
+
+      // 4 · Marca (10.4–16.4 s)
+      tl.to([...cards.map((c) => c.el), '.lane', '#speed', '#hex'], { opacity: 0, y: '-=30', duration: 0.5, stagger: 0.015 }, 10.2);
+      tl.fromTo('#brand svg', { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.6)' }, 11.0);
+      tl.fromTo('#brand h1 span', { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.12, ease: 'expo.out' }, 11.4);
+      tl.fromTo('#brand p', { opacity: 0 }, { opacity: 1, duration: 0.6 }, 12.2);
+      tl.fromTo('#brand small', { opacity: 0 }, { opacity: 1, duration: 0.6 }, 12.6);
+
+      // 5 · Fundido para cerrar el bucle
+      tl.to('#brand', { opacity: 0, duration: 0.8 }, 16.6);
+
+      tl.to({}, { duration: 0.1 }, 17.9);
+      window.__timelines['main'] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
